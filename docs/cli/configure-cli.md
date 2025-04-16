@@ -3,6 +3,9 @@
 ## AWS CLI instalation 
 https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
 
+### Check instalation
+`aws --version`
+
 ## Configure
 `aws configure`
 
