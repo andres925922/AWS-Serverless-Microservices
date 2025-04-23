@@ -25,4 +25,17 @@
    ```
 
 2) Install Dependencies:
-   pip install -r requirements.txt
+   python3 -m pip install -r requirements.txt --ignore-installed --no-cache-dir
+
+
+## Bootstrap app
+
+`cdk bootstrap` will create the stage in cloudformation
+
+## Synth
+
+`cdk synth`
+
+## Deploy the stack
+
+`cdk deploy`
