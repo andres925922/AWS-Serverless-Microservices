@@ -2,6 +2,8 @@ from aws_cdk import (
     # Duration,
     Stack,
     # aws_sqs as sqs,
+    aws_lambda as lambda_,
+    aws_apigateway as apigateway,
 )
 from constructs import Construct
 
@@ -11,9 +13,15 @@ class ApigateLambdaSyncStack(Stack):
         super().__init__(scope, construct_id, **kwargs)
 
         # The code that defines your stack goes here
+        helloLambda = lambda_.Function(
+            self, "HelloLambda",
+            runtime=lambda_.Runtime.PYTHON_3_9,
+            handler="hello_handler.main",
+            code=lambda_.Code.from_asset("../lambdas/hello")
+        )
 
-        # example resource
-        # queue = sqs.Queue(
-        #     self, "ApigateLambdaSyncQueue",
-        #     visibility_timeout=Duration.seconds(300),
-        # )
+        helloLambdaApi = apigateway.LambdaRestApi(
+            self, "HelloLambdaApiGateway",
+            handler=helloLambda,
+            proxy=True
+        )
