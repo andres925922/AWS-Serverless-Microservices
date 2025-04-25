@@ -1,7 +1,9 @@
 from aws_cdk import (
     Duration,
+    RemovalPolicy,
     Stack,
     aws_sqs as sqs,
+    aws_s3 as s3,
 )
 from constructs import Construct
 
@@ -16,4 +18,11 @@ class HelloCdkStack(Stack):
             self, "HelloCdkQueue",
             visibility_timeout=Duration.seconds(300),
             fifo=True,
+        )
+
+        bucket = s3.Bucket(
+            self, "HelloCdkBucket",
+            versioned=True,
+            removal_policy=RemovalPolicy.DESTROY,
+            auto_delete_objects=True,
         )
