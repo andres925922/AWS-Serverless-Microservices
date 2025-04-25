@@ -15,8 +15,8 @@ aws sts get-caller-identity
 
 # Result
 {
-    "UserId": "AIDAY5OXZRUDQBIQYEVJ7",
-    "Account": "613022272775",
-    "Arn": "arn:aws:iam::613022272775:user/pela"
+    "UserId": "xxxxxxxxxxxxxxxxxxxxx",
+    "Account": "xxxxxxxxxxxxxxxxxxxxxxxx",
+    "Arn": "arn:aws:iam::xxxxxxxxxxxxxxx:user/xxxxxx"
 }
 ```
