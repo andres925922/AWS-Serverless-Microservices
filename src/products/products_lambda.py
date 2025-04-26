@@ -6,7 +6,7 @@ from boto3.dynamodb.conditions import Key
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table('products')
 
-def lambda_handler(event, context):
+def handler(event, context):
     method = event['httpMethod']
     path_params = event.get('pathParameters') or {}
     query_params = event.get('queryStringParameters') or {}

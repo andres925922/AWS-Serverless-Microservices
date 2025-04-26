@@ -17,6 +17,9 @@ class DatabaseStack(Construct):
         create_tables(): Creates all the DynamoDB tables.
         
     """
+    products_table: Table = None
+    orders_table: Table = None
+    basket_table: Table = None
 
     def __init__(self, scope: Construct, id: str, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
@@ -26,8 +29,8 @@ class DatabaseStack(Construct):
            Builder method to create all DynamoDB tables for the e-commerce microservice. 
         """
         self._create_products_table()
-        self._create_basket_table()
-        self._create_orders_table()
+        # self._create_basket_table()
+        # self._create_orders_table()
         return self
 
 
