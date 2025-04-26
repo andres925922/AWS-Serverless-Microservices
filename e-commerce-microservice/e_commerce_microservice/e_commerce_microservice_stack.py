@@ -2,8 +2,12 @@ from aws_cdk import (
     # Duration,
     Stack,
     # aws_sqs as sqs,
+    aws_dynamodb as dynamodb,
+    RemovalPolicy,
 )
 from constructs import Construct
+
+from database import DatabaseStack
 
 class ECommerceMicroserviceStack(Stack):
 
@@ -12,8 +16,5 @@ class ECommerceMicroserviceStack(Stack):
 
         # The code that defines your stack goes here
 
-        # example resource
-        # queue = sqs.Queue(
-        #     self, "ECommerceMicroserviceQueue",
-        #     visibility_timeout=Duration.seconds(300),
-        # )
+        # DynmamoDB tables
+        database: DatabaseStack = DatabaseStack(self, "DatabaseStack").create_tables()
