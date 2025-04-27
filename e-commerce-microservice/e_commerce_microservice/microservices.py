@@ -33,6 +33,7 @@ class LambdaStack(Construct):
             runtime=Runtime.PYTHON_3_12,
             handler="products_lambda.handler",
             code=Code.from_asset("../src/products"),  # relative to cdk.json
+            layers=[], #TODO: add layers
             environment={
                 "PRIMARY_KEY": "id",
                 "PRODUCTS_TABLE": self.props.products_table.table_name,
@@ -44,3 +45,5 @@ class LambdaStack(Construct):
         self.props.products_table.grant_read_write_data(products_lambda)
 
         return products_lambda
+    
+    # TODO: Implement common layer

@@ -1,6 +1,7 @@
 import json
 import boto3
 import uuid
+import datetime
 from boto3.dynamodb.conditions import Key
 
 dynamodb = boto3.resource('dynamodb')
@@ -56,6 +57,7 @@ def get_product_by_id(product_id):
 def create_product(data):
     product_id = str(uuid.uuid4())
     data['id'] = product_id
+    data['created_at'] = int(datetime.datetime.now().timestamp())
     table.put_item(Item=data)
     return build_response(201, {'message': 'Product created', 'id': product_id})
 
@@ -79,7 +81,7 @@ def build_response(status_code, body, cors=False):
     return {
         'statusCode': status_code,
         'headers': headers,
-        'body': json.dumps(body)
+        'body': body
     }
 
 def loads_body(event):

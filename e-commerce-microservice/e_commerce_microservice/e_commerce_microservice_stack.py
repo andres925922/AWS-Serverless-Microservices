@@ -1,9 +1,9 @@
 from aws_cdk import Stack
 from constructs import Construct
 
-from databases import DatabaseStack
-from microservices import MicroserviceProps, LambdaStack
-from api_gates import ApiGatewayStack, ApiGatewayProps
+from .databases import DatabaseStack
+from .microservices import MicroserviceProps, LambdaStack
+from .api_gates import ApiGatewayStack, ApiGatewayProps
 
 class ECommerceMicroserviceStack(Stack):
 

@@ -1,5 +1,5 @@
 from abc import ABC
-from aws_cdk.aws_apigateway import LambdaRestApi
+from aws_cdk.aws_apigateway import LambdaRestApi, LambdaIntegration, Model, RequestValidator, JsonSchema, JsonSchemaType
 from aws_cdk.aws_lambda import IFunction
 
 from constructs import Construct
@@ -31,7 +31,7 @@ class ApiGatewayStack(Construct):
     def _create_products_api(self, products_lambda: IFunction) -> None:
 
         # Create the API Gateway
-        self.api = LambdaRestApi(
+        self.products_api = LambdaRestApi(
             self, "ProductsApi",
             handler=products_lambda,
             proxy=False,
@@ -39,15 +39,47 @@ class ApiGatewayStack(Construct):
             description="This service serves products.",
         )
 
+        # Define the request model for the API
+        post_products_model = Model(
+            self, "PostProductsModel",
+            rest_api=self.products_api,
+            content_type="application/json",
+            model_name="PostProductsModel",
+            schema=JsonSchema(
+                type=JsonSchemaType.OBJECT,
+                properties={
+                    "name": JsonSchema(type=JsonSchemaType.STRING),
+                    "category": JsonSchema(type=JsonSchemaType.STRING),
+                    "price": JsonSchema(type=JsonSchemaType.NUMBER),
+                    "description": JsonSchema(type=JsonSchemaType.STRING),
+                    "created_at": JsonSchema(type=JsonSchemaType.STRING),
+                },
+                required=["id", "name", "price"],
+            ),
+        )
+        post_products_validator = RequestValidator(
+            self, "PostProductsValidator",
+            rest_api=self.products_api,
+            request_validator_name="PostProductsValidator",
+            validate_request_body=True,
+            validate_request_parameters=False,
+        )
+
+        products_integration = LambdaIntegration(products_lambda)
+
         # Define the /products resource
-        products_resource = self.api.root.add_resource("products")
+        products_resource = self.products_api.root.add_resource("products", default_integration=products_integration)
         products_resource.add_method("GET")  # GET /products
-        products_resource.add_method("POST")  # POST /products
+        products_resource.add_method(
+            "POST", 
+            request_validator=post_products_validator, 
+            request_models={"application/json": post_products_model}
+        )  # POST /products
         products_resource.add_method("OPTIONS")
 
         # Define the /products/{id} resource
         single_product_resource = products_resource.add_resource("{id}")
-        single_product_resource.add_method("GET")
-        single_product_resource.add_method("PUT")
-        single_product_resource.add_method("DELETE")
+        single_product_resource.add_method("GET", products_integration)
+        single_product_resource.add_method("PUT", products_integration)
+        single_product_resource.add_method("DELETE", products_integration)
         single_product_resource.add_method("OPTIONS")
