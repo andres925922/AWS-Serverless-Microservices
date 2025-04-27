@@ -2,6 +2,7 @@ import json
 import boto3
 import uuid
 import datetime
+from decimal import Decimal
 from boto3.dynamodb.conditions import Key
 
 dynamodb = boto3.resource('dynamodb')
@@ -57,6 +58,7 @@ def get_product_by_id(product_id):
 def create_product(data):
     product_id = str(uuid.uuid4())
     data['id'] = product_id
+    data['price'] = Decimal(str(data.get('price',0)))
     data['created_at'] = int(datetime.datetime.now().timestamp())
     table.put_item(Item=data)
     return build_response(201, {'message': 'Product created', 'id': product_id})
@@ -70,6 +72,16 @@ def delete_product(product_id):
     table.delete_item(Key={'id': product_id})
     return build_response(200, {'message': 'Product deleted'})
 
+# Custom JSON encoder to handle Decimal objects
+class DecimalEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, Decimal):
+            if o % 1 == 0:
+                return int(o)
+            else:
+                return float(o)
+        return super(DecimalEncoder, self).default(o)
+
 def build_response(status_code, body, cors=False):
     headers = {'Content-Type': 'application/json'}
     if cors:
@@ -81,7 +93,7 @@ def build_response(status_code, body, cors=False):
     return {
         'statusCode': status_code,
         'headers': headers,
-        'body': body
+        'body': json.dumps(body, cls=DecimalEncoder)
     }
 
 def loads_body(event):
