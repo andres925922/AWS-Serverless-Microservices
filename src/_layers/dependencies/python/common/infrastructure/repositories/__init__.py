@@ -1,0 +1,1 @@
+from .dynamo_common_repository import DynamoCommonRepository

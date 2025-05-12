@@ -1,0 +1,31 @@
+version: 1
+disable_existing_loggers: true
+incremental: false
+
+formatters:
+  console_formatter:
+    style: '{'
+    format: 'CONSOLE FORMATTER: {asctime} - {name} - {levelname} - {module} - {funcName} - {message}'
+  stream_formatter:
+    "()": common.logger.JsonFormatter
+handlers:
+  console_handler:
+    class: logging.StreamHandler
+    formatter: console_formatter
+    level: WARNING
+    stream: ext://sys.stdout
+  stream_handler:
+    class: logging.StreamHandler
+    formatter: console_formatter
+    level: INFO
+    stream: ext://sys.stdout
+
+loggers:
+  
+  microservice:
+    propagate: false
+    handlers: [stream_handler, console_handler]
+
+root:
+  level: DEBUG
+  handlers: [stream_handler]
