@@ -27,9 +27,9 @@ class HttpException(Exception):
                     logger.error(f"HTTP Exception: {e}", extra={
                         "code": e.code,
                         "caller": func.__name__,
-                        "args": args,
-                        "kwargs": kwargs,
-                        "message": str(e),
+                        "handler_args": args,
+                        "handler_kwargs": kwargs,
+                        "detailed_message": str(e),
                         "traceback": traceback.format_exc(),
                     })
                     return build_response(
@@ -41,9 +41,9 @@ class HttpException(Exception):
                 except Exception as e:
                     logger.error(f"Exception: {e}", extra={
                         "caller": func.__name__,
-                        "args": args,
-                        "kwargs": kwargs,
-                        "message": str(e),
+                        "handler_args": args,
+                        "handler_kwargs": kwargs,
+                        "detailed_message": str(e),
                         "traceback": traceback.format_exc(),
                     })
                     return build_response(

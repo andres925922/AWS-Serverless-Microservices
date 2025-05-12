@@ -37,14 +37,15 @@ class LambdaStack(Construct):
                 file="Dockerfile",
                 build_args={
                     "LAMBDA_ROOT_SOURCE": "products"
-                }
+                },
+                display_name="ProductsLambda"
             ),
             environment={
                 "PRIMARY_KEY": "id",
-                "PRODUCTS_TABLE": self._props.products_table.table_name,
-                "LAMBDA_HANDLER": "products.handler.handle",
+                "PRODUCTS_TABLE": self._props.products_table.table_name
             },
             memory_size=128,
+            function_name="ProductsLambda",
             timeout=Duration.seconds(30),
         )
 
@@ -60,14 +61,15 @@ class LambdaStack(Construct):
                 file="Dockerfile",
                 build_args={
                     "LAMBDA_ROOT_SOURCE": "basket"
-                }
+                },
+                display_name="BasketLambda"
             ),
             environment={
                 "PRIMARY_KEY": "id",
-                "BASKET_TABLE": self._props.basket_table.table_name,
-                "LAMBDA_HANDLER": "basket.handler.handle",
+                "BASKET_TABLE": self._props.basket_table.table_name
             },
             memory_size=128,
+            function_name="BasketLambda",
             timeout=Duration.seconds(30),
         )
 
@@ -83,14 +85,15 @@ class LambdaStack(Construct):
                 file="Dockerfile",
                 build_args={
                     "LAMBDA_ROOT_SOURCE": "orders"
-                }
+                },
+                display_name="OrdersLambda"
             ),
             environment={
                 "PRIMARY_KEY": "id",
-                "ORDERS_TABLE": self._props.orders_table.table_name,
-                "LAMBDA_HANDLER": "orders.handler.handle",
+                "ORDERS_TABLE": self._props.orders_table.table_name
             },
             memory_size=128,
+            function_name="OrdersLambda",
             timeout=Duration.seconds(30),
         )
 
