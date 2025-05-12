@@ -29,8 +29,8 @@ class DatabaseStack(Construct):
            Builder method to create all DynamoDB tables for the e-commerce microservice. 
         """
         self._create_products_table()
-        # self._create_basket_table()
-        # self._create_orders_table()
+        self._create_basket_table()
+        self._create_orders_table()
         return self
 
 
@@ -55,7 +55,7 @@ class DatabaseStack(Construct):
         # DynamoDB table for baskets
         self.basket_table = Table(
             self, "basket",
-            partition_key=Attribute(name="id", type=AttributeType.STRING),
+            partition_key=Attribute(name="userId", type=AttributeType.STRING),
             # sort_key=Attribute(name="created_at", type=AttributeType.STRING),
             table_name="basket",
             billing_mode=BillingMode.PAY_PER_REQUEST,
@@ -70,8 +70,15 @@ class DatabaseStack(Construct):
         self.orders_table = Table(
             self, "orders",
             partition_key=Attribute(name="id", type=AttributeType.STRING),
-            # sort_key=Attribute(name="created_at", type=AttributeType.STRING),
+            sort_key=Attribute(name="userId", type=AttributeType.STRING),
             table_name="orders",
             billing_mode=BillingMode.PAY_PER_REQUEST,
             removal_policy=RemovalPolicy.DESTROY,  # NOT recommended for production code
         )
+
+        # self.orders_table.add_global_secondary_index(
+        #     index_name="userIdIndex",
+        #     partition_key=Attribute(name="userId", type=AttributeType.STRING),
+        #     sort_key=Attribute(name="created_at", type=AttributeType.STRING),
+        #     projection_type="ALL",
+        # )

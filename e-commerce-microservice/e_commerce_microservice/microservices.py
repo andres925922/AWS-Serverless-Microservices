@@ -24,43 +24,85 @@ class LambdaStack(Construct):
 
     def __init__(self, scope: Construct, id: str, props: IMicroserviceProps, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
-        self.props: IMicroserviceProps = props
-        self.common_layer: LayerVersion = self._create_dependencies_layer()
+        self._props: IMicroserviceProps = props
+        self._common_layer: LayerVersion = self._create_dependencies_layer()
         self.products_lambda: Function = self._create_products_lambda_microservice()
+        self.basket_lambda: Function = self._create_basket_lambda_microservice()
+        self.orders_lambda: Function = self._create_orders_lambda_microservice()
 
     def _create_products_lambda_microservice(self) -> Function:
         products_lambda = Function(
             self, "ProductsLambda",
             runtime=Runtime.PYTHON_3_12,
-            handler="products_lambda.handler",
+            handler="handler.handle",
             code=Code.from_asset("../src/products"),  # relative to cdk.json
             layers=[
-                self.common_layer,
-            ], #TODO: add layers, common layer
+                self._common_layer,
+            ], 
             environment={
                 "PRIMARY_KEY": "id",
-                "PRODUCTS_TABLE": self.props.products_table.table_name,
+                "PRODUCTS_TABLE": self._props.products_table.table_name,
             },
             memory_size=128,
             timeout=Duration.seconds(30),
         )
 
-        self.props.products_table.grant_read_write_data(products_lambda)
+        self._props.products_table.grant_read_write_data(products_lambda)
 
         return products_lambda
     
-    # TODO: Implement common layer
+    def _create_basket_lambda_microservice(self) -> Function:
+        basket_lambda = Function(
+            self, "BasketLambda",
+            runtime=Runtime.PYTHON_3_12,
+            handler="handler.handle",
+            code=Code.from_asset("../src/basket"),  # relative to cdk.json
+            layers=[
+                self._common_layer,
+            ], 
+            environment={
+                "PRIMARY_KEY": "id",
+                "BASKET_TABLE": self._props.basket_table.table_name,
+            },
+            memory_size=128,
+            timeout=Duration.seconds(30),
+        )
+
+        self._props.basket_table.grant_read_write_data(basket_lambda)
+
+        return basket_lambda
+    
+    def _create_orders_lambda_microservice(self) -> Function:
+        orders_lambda = Function(
+            self, "OrdersLambda",
+            runtime=Runtime.PYTHON_3_12,
+            handler="handler.handle",
+            code=Code.from_asset("../src/orders"),  # relative to cdk.json
+            layers=[
+                self._common_layer,
+            ], 
+            environment={
+                "PRIMARY_KEY": "id",
+                "ORDERS_TABLE": self._props.orders_table.table_name,
+            },
+            memory_size=128,
+            timeout=Duration.seconds(30),
+        )
+
+        self._props.basket_table.grant_read_write_data(orders_lambda)
+
+        return orders_lambda
 
     def _create_dependencies_layer(self) -> LayerVersion:
         return LayerVersion(
             self, "DependenciesLayer",
             code=Code.from_asset(
-                path="../src/layers/dependencies",  # where your requirements.txt is
+                path="../src/_layers/dependencies",  # where your requirements.txt is
                 bundling=BundlingOptions(
                     image=DockerImage.from_registry("python:3.12-slim"), 
                     command=[
                         "bash", "-c",
-                        "pip install --no-cache-dir -r requirements.txt -t /asset-output/python"
+                        "pip install --no-cache-dir -r requirements.txt -t /asset-output/python && cp -r python/* /asset-output/python/ "
                     ],
                 ),
             ),
