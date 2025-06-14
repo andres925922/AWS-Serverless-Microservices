@@ -1,0 +1,6 @@
+{
+  "python.analysis.extraPaths": [
+    "src/_layers/dependencies/python"
+  ],
+  "python.envFile": "${workspaceFolder}/.env"
+}

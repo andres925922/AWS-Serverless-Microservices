@@ -1,8 +1,9 @@
-from typing import List, Dict
+from typing import List, Dict, Union
 from constructs import Construct
 from aws_cdk.aws_events import EventBus, Rule, EventPattern
 from aws_cdk.aws_lambda import IFunction
-from aws_cdk.aws_events_targets import LambdaFunction
+from aws_cdk.aws_events_targets import LambdaFunction, SqsQueue
+from aws_cdk.aws_sqs import IQueue
 
 class EventBusFactory(Construct):
     def __init__(self, scope: Construct, id: str, **kwargs) -> None:
@@ -45,6 +46,17 @@ class EventBusFactory(Construct):
         rule = self.rules.get(rule_id, None)
         if rule:
             rule.add_target(LambdaFunction(target))
+            return self
+        else:
+            raise ValueError(f"Rule {rule_id} not found.")
+        
+    def add_sqs_target(self, rule_id: str, queue: IQueue) -> 'EventBusFactory':
+        """
+        Add an SQS target to the event rule.
+        """
+        rule = self.rules.get(rule_id, None)
+        if rule:
+            rule.add_target(SqsQueue(queue))
             return self
         else:
             raise ValueError(f"Rule {rule_id} not found.")

@@ -1,10 +1,11 @@
-from aws_cdk import Stack
+from aws_cdk import Stack, Duration
 from constructs import Construct
 
 from .databases import DatabaseStack
 from .microservices import MicroserviceProps, LambdaStack
 from .api_gates import ApiGatewayStack, ApiGatewayProps
 from .event_bus import EventBusFactory
+from .sqs_queue import SQSQueueFactory, SQSQueueProps
 
 class ECommerceMicroserviceStack(Stack):
 
@@ -32,10 +33,22 @@ class ECommerceMicroserviceStack(Stack):
         api_gateway_stack: ApiGatewayStack = ApiGatewayStack(self, "ApiGatewayStack", props=api_gateway_props)
 
         e_commerce_event_bus = EventBusFactory(self, "ECommerceEventBus").create_event_bus("e-commerce-event-bus")
+
+        order_queue = SQSQueueFactory(self, 
+                                    "OrderQueue", 
+                                    props=SQSQueueProps("e-commerce-sqs-queue", 
+                                        visibility_timeout=Duration.seconds(30),
+                                        consumer=lambda_stack.orders_lambda
+                                    )
+                                ) \
+                                .create_queue() \
+                                .add_consumer()
+        
+        # TODO: attach rule can receive a property object instead of multiple parameters
         e_commerce_event_bus.attach_rule(
                 rule_id="CheckoutBasketRule",
                 desc="Rule for order created events",
                 souces=["com.e_commerce.checkout_basket"],
                 detail_types=["checkout_basket"]) \
-            .add_target("CheckoutBasketRule", lambda_stack.orders_lambda) \
+            .add_sqs_target("CheckoutBasketRule", order_queue) \
             .grant_publish_permissions(lambda_stack.basket_lambda)
