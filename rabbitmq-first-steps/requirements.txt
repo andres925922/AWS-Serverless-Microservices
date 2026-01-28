@@ -1,0 +1,6 @@
+jupyter
+pika
+aio-pika
+requests
+pydantic
+pydantic-settings

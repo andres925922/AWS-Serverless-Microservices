@@ -1,0 +1,19 @@
+{
+    "include": [
+        "rabbitmq-first-steps",
+        "src",
+        "e-commerce-microservice",
+    ],
+    "extraPaths": [
+        "src",
+        "rabbitmq-first-steps",
+    ],
+    "exclude": [
+        "dist",
+        "__pycache__"
+    ],
+    "reportMissingTypeStubs": false,
+    "reportMissingImports": "warning",
+    "typeCheckingMode": "basic",
+    "venvPath": ".venv"
+}
